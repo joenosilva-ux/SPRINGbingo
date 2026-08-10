@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Crie e imprima lotes de cartelas de bingo com a arte do seu evento">
+    <title>Monte suas cartelas de bingo</title>
+    <link rel="stylesheet" th:href="@{/css/bingo.css}" href="/css/bingo.css">
+    <script defer th:src="@{/js/bingo.js}" src="/js/bingo.js"></script>
+</head>
+<body>
+<header class="topo">
+    <div class="topo-conteudo">
+        <div class="marca" aria-hidden="true">B</div>
+        <div>
+            <p class="etiqueta">Gerador para impressão</p>
+            <h1>Monte suas cartelas de bingo</h1>
+            <p class="subtitulo">Escolha o formato, coloque sua arte e imprima. Os números ficam por nossa conta.</p>
+        </div>
+    </div>
+</header>
+
+<main class="aplicacao">
+    <section class="painel-configuracao" aria-labelledby="titulo-configuracao">
+        <form id="formulario-bingo" novalidate>
+            <div class="passo">
+                <span class="numero-passo">1</span>
+                <div class="conteudo-passo">
+                    <fieldset>
+                        <legend id="titulo-configuracao">O que você vai imprimir?</legend>
+                        <div class="opcoes-modo">
+                            <label class="opcao-modo">
+                                <input type="radio" name="modo" value="VARIOS_PREMIOS" checked>
+                                <span class="opcao-icone" aria-hidden="true">↻</span>
+                                <span>
+                                    <strong>Uma cartela para vários prêmios</strong>
+                                    <small>A mesma cartela se repete em cada prêmio da folha.</small>
+                                </span>
+                            </label>
+                            <label class="opcao-modo">
+                                <input type="radio" name="modo" value="CARTELAS_PARA_JOGADORES">
+                                <span class="opcao-icone" aria-hidden="true">▦</span>
+                                <span>
+                                    <strong>Cartelas para os jogadores</strong>
+                                    <small>Combinações diferentes, agrupadas para economizar papel.</small>
+                                </span>
+                            </label>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div class="passo">
+                <span class="numero-passo">2</span>
+                <div class="conteudo-passo campos-linha">
+                    <label class="campo-quantidade">
+                        <span>Quantas cartelas diferentes?</span>
+                        <input id="quantidade-cartelas" name="quantidadeCartelas" type="number"
+                               min="1" max="200" value="1" inputmode="numeric" required>
+                        <small>De 1 a 200 por vez</small>
+                    </label>
+
+                    <fieldset id="grupo-premios" class="grupo-quantidade">
+                        <legend>Quantos prêmios em cada folha?</legend>
+                        <div class="botoes-quantidade">
+                            <label th:each="numero : ${#numbers.sequence(1, 6)}">
+                                <input type="radio" name="quantidadePremios" th:value="${numero}"
+                                       th:checked="${numero == 1}">
+                                <span th:text="${numero}">1</span>
+                            </label>
+                        </div>
+                    </fieldset>
+
+                    <fieldset id="grupo-por-pagina" class="grupo-quantidade" hidden>
+                        <legend>Quantas cartelas por folha?</legend>
+                        <div class="botoes-quantidade botoes-largos">
+                            <label th:each="numero : ${ {2, 4, 6} }">
+                                <input type="radio" name="cartelasPorPagina" th:value="${numero}"
+                                       th:checked="${numero == 4}">
+                                <span><b th:text="${numero}">4</b> por folha</span>
+                            </label>
+                        </div>
+                    </fieldset>
+                </div>
+            </div>
+
+            <div id="passo-nomes-premios" class="passo">
+                <span class="numero-passo">3</span>
+                <div class="conteudo-passo">
+                    <details id="personalizar-premios">
+                        <summary>Personalizar os nomes dos prêmios <small>(opcional)</small></summary>
+                        <p class="ajuda">Se deixar em branco, usaremos “1º prêmio”, “2º prêmio” e assim por diante.</p>
+                        <div id="campos-premios" class="campos-premios">
+                            <label th:each="numero : ${#numbers.sequence(1, 6)}" th:attr="data-premio-campo=${numero}">
+                                <span th:text="|${numero}º prêmio|">1º prêmio</span>
+                                <input type="text" maxlength="50" th:attr="data-premio-input=${numero}"
+                                       th:placeholder="|Ex.: ${numero == 1 ? 'Cesta básica' : 'Prêmio ' + numero}|">
+                            </label>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <div class="passo">
+                <span id="numero-passo-arte" class="numero-passo">4</span>
+                <div class="conteudo-passo">
+                    <label class="titulo-campo" for="arte-evento">Coloque a arte do seu evento <small>(opcional)</small></label>
+                    <div id="seletor-arte" class="seletor-arte" role="button" tabindex="0"
+                         aria-controls="arte-evento">
+                        <input id="arte-evento" type="file" accept="image/png,image/jpeg,image/webp">
+                        <span class="icone-imagem" aria-hidden="true">▧</span>
+                        <span><strong>Escolher imagem</strong><small>PNG, JPEG ou WebP, até 8 MB</small></span>
+                    </div>
+                    <div id="arte-selecionada" class="arte-selecionada" hidden>
+                        <img id="miniatura-arte" alt="Prévia da arte do evento">
+                        <span id="nome-arte"></span>
+                        <button id="remover-arte" type="button">Remover</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="resumo-geracao">
+                <div>
+                    <strong>Seu lote</strong>
+                    <p id="resumo-lote" aria-live="polite">1 cartela diferente em 1 folha A4, com 1 prêmio.</p>
+                </div>
+                <button id="gerar-lote" class="botao botao-secundario" type="submit">Gerar prévia</button>
+            </div>
+            <p id="mensagem-status" class="mensagem-status" role="status" aria-live="polite"></p>
+        </form>
+    </section>
+
+    <section class="area-previa" aria-labelledby="titulo-previa">
+        <div class="barra-previa">
+            <div>
+                <p class="etiqueta">Prévia de impressão</p>
+                <h2 id="titulo-previa">Suas folhas A4</h2>
+            </div>
+            <div class="acoes-previa">
+                <button id="novos-numeros" class="botao botao-discreto" type="button">Gerar outros números</button>
+                <button id="imprimir" class="botao botao-principal" type="button">Imprimir</button>
+            </div>
+        </div>
+
+        <nav class="navegacao-folhas" aria-label="Navegação entre as folhas">
+            <button id="folha-anterior" class="botao botao-discreto" type="button" disabled>← Anterior</button>
+            <strong id="indicador-folha" aria-live="polite">Folha 1 de 1</strong>
+            <button id="proxima-folha" class="botao botao-discreto" type="button" disabled>Próxima →</button>
+        </nav>
+
+        <div id="folha-atual" class="lista-folhas" aria-live="polite" aria-busy="false"
+             th:attr="data-lote-id=${loteId},data-total-folhas=${totalFolhas},data-pagina-atual=1">
+            <article th:replace="~{fragments/folha :: folha}"></article>
+        </div>
+    </section>
+</main>
+</body>
+</html>

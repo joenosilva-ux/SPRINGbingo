@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<article class="folha-a4 sem-arte" th:fragment="folha"
+         th:classappend="| itens-${pagina.itens.size()}|"
+         th:attr="data-pagina=${pagina.numero},data-total-folhas=${totalFolhas},data-itens=${pagina.itens.size()}">
+    <img class="marca-dagua-evento" alt="" aria-hidden="true" hidden>
+
+    <div class="grade-cartelas">
+        <section class="cartela-bloco" th:each="item : ${pagina.itens}"
+                 th:attr="data-numero-premio=${item.numeroPremio}">
+            <div class="identificacao-cartela">
+                <strong class="titulo-premio" th:if="${item.numeroPremio > 0}"
+                        th:text="${item.titulo}">1º prêmio</strong>
+                <strong th:unless="${item.numeroPremio > 0}">Bingo</strong>
+                <span th:text="${item.identificacao}">Cartela 001</span>
+            </div>
+            <table class="cartela" th:with="cartela=${item.cartela}">
+                <thead>
+                <tr>
+                    <th scope="col">B</th><th scope="col">I</th><th scope="col">N</th>
+                    <th scope="col">G</th><th scope="col">O</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="linha : ${#numbers.sequence(0, 4)}">
+                    <td th:text="${cartela.b[linha]}">1</td>
+                    <td th:text="${cartela.i[linha]}">16</td>
+                    <td th:if="${linha != 2}" th:text="${cartela.n[linha]}">31</td>
+                    <td th:if="${linha == 2}" class="livre" aria-label="Espaço livre">LIVRE</td>
+                    <td th:text="${cartela.g[linha]}">46</td>
+                    <td th:text="${cartela.o[linha]}">61</td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <footer class="rodape-folha">
+        <span th:text="|Folha ${pagina.numero} de ${totalFolhas}|">Folha 1 de 1</span>
+    </footer>
+</article>
+</body>
+</html>

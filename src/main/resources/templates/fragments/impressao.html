@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="conteudo-impressao" th:fragment="impressao">
+    <th:block th:each="paginaDoLote : ${lote.paginas}"
+              th:with="pagina=${paginaDoLote},totalFolhas=${lote.totalFolhas},configuracao=${lote.configuracao}">
+        <article th:replace="~{fragments/folha :: folha}"></article>
+    </th:block>
+</div>
+</body>
+</html>
